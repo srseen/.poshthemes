@@ -2,109 +2,89 @@
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
     {
+      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "background": "#0d49a9",
-          "foreground": "#FFFFFF",
-          "leading_diamond": "\ue0b6",
-          "properties": {
-            "display_host": false
-          },
-          "style": "diamond",
-          "template": "{{ if ne (env \"WSL_DISTRO_NAME\") \"\" }}WSL: {{ env \"WSL_DISTRO_NAME\" }} | {{ .UserName }}{{ else }}WIN | {{ .UserName }}{{ end }} ",
-          "type": "session"
+          // OS: ใช้สีน้ำเงินสด แยก WSL กับ Windows
+          "type": "os",
+          "style": "plain",
+          "foreground": "#3A86FF",
+          "template": "[{{ if .WSL }}WSL{{ else }}WIN{{ end }}]|"
         },
         {
-          "background": "#242424",
-          "foreground": "#FBC02D",
+          // User name: กลับมาใช้แดงเดิม
+          "type": "session",
+          "style": "plain",
+          "foreground": "#f1184c",
+          "template": " {{ .UserName }} |"
+        },
+        {
+          // แสดงเฉพาะตอนเป็น root
+          "type": "root",
+          "style": "plain",
+          "foreground": "#f1184c",
+          "template": " - root |"
+        },
+        {
+          // เวลา: สีเหลืองสด
+          "type": "time",
+          "style": "plain",
+          "foreground": "#FFBB00",
           "properties": {
+            "time_format": "2006-01-02 15:04:05"
+          },
+          "template": " {{ .CurrentDate | date .Format }} |"
+        },
+        {
+          // Path: กลับมาใช้เขียวเดิม
+          "type": "path",
+          "style": "plain",
+          "foreground": "#33DD2D",
+          "properties": {
+            "folder_separator_icon": "/",
             "style": "full"
           },
-          "style": "plain",
-          "template": " {{ .Path }} ",
-          "type": "path"
+          "template": " {{ .Path }} |"
         },
         {
-          "background": "#242424",
-          "foreground": "#1E88E5",
-          "properties": {
-            "fetch_status": true
-          },
+          // Git: สีน้ำเงินสด
+          "type": "git",
           "style": "plain",
-          "template": " branch ({{ .HEAD }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}) ",
-          "type": "git"
+          "foreground": "#3A86FF",
+          "template": " git: {{ .HEAD }}{{ if gt .StashCount 0 }} (stash: {{ .StashCount }}){{ end }} |"
         },
         {
-          "background": "#242424",
-          "foreground": "#00C853",
-          "properties": {
-            "paused_icon": "",
-            "playing_icon": "",
-            "stopped_icon": "",
-            "track_separator": " - "
-          },
-          "style": "plain",
-          "template": " {{ .Icon }}{{ if ne .Status \"stopped\" }}{{ .Artist }} - {{ .Track }}{{ end }} ",
-          "type": "spotify"
-        },
-        {
-          "background": "#B71C1C",
-          "foreground": "#FFFFFF",
-          "properties": {
-            "time_format": "15:04:05"
-          },
-          "style": "plain",
-          "template": " {{ .CurrentDate | date .Format }} ",
-          "type": "time"
-        },
-        {
-          "background": "#242424",
-          "foreground": "#FBC02D",
-          "properties": {
-            "style": "dallas",
-            "threshold": 0
-          },
-          "style": "plain",
-          "template": " {{ .FormattedMs }}s ",
-          "type": "executiontime"
-        },
-        {
+          // Status: สีเฉพาะของ status ไม่ชนกับ user/path
+          // OK  = #00C853 (เขียวอมฟ้า)
+          // ERR = #FF5722 (ส้มแดง)
           "type": "status",
-          "style": "diamond",
-          "foreground": "#FFFFFF",
-          "background": "#086e05",
-          "background_templates": [
-            "{{ if .Error }}#D32F2F{{ end }}"
+          "style": "plain",
+          "foreground": "#3A86FF",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}#f1184c{{ end }}"
           ],
-          "trailing_diamond": "\ue0b0",
           "properties": {
             "always_enabled": true
-          }
+          },
+          "template": "[{{ if eq .Code 0 }}OK{{ else }}ERR{{ end }}]"
         }
-      ],
-      "type": "prompt"
+      ]
     },
     {
+      // บรรทัดใหม่สำหรับ prompt symbol
       "type": "prompt",
-      "newline": true,
       "alignment": "left",
+      "newline": true,
       "segments": [
         {
-          "foreground": "#FFFFFF",
-          "foreground_templates": [
-            "{{ if gt .Code 0 }}#D32F2F{{ end }}"
-          ],
-          "properties": {
-            "always_enabled": true
-          },
+          "type": "text",
           "style": "plain",
-          "template": "\u276f ",
-          "type": "status"
+          "foreground": "#f1184c",
+          "template": "➜ "
         }
       ]
     }
   ],
-  "final_space": true,
   "version": 3
 }
